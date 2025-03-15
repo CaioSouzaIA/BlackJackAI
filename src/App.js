@@ -507,17 +507,30 @@ const LoginScreen = ({ onLogin }) => {
     setErrorMessage('');
     
     try {
+      console.log("Tentando login com:", loginData.email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Erro de login detalhado:', error);
+        
+        // Verifica se é um erro de email não confirmado
+        if (error.message.includes('email not confirmed')) {
+          setErrorMessage('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.');
+        } else {
+          setErrorMessage(`Erro: ${error.message}`);
+        }
+        return;
+      }
       
+      console.log("Login bem-sucedido:", data);
       onLogin(data.user);
     } catch (error) {
-      console.error('Erro de login:', error);
-      setErrorMessage(t('Email ou senha inválidos. Tente novamente.'));
+      console.error('Erro completo:', error);
+      setErrorMessage(`Erro: ${error.message || 'Email ou senha inválidos'}`);
     } finally {
       setIsLoading(false);
     }
