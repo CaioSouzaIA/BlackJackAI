@@ -146,6 +146,10 @@ const getStatusColor = (status) => {
 const getWinPercentage = (status) => {
   // Baseado em estudos de vantagem do jogador vs contagem verdadeira
   // Fonte: https://www.blackjackapprenticeship.com/card-counting/
+<<<<<<< HEAD
+=======
+  const baseChance = 49; // Chance base do jogador (~49% em contagem neutra)
+>>>>>>> af41b5e (Ajuste removedor de cartas)
   
   switch (status) {
     case "MUITO FAVORÁVEL": return "55-58%"; // Contagem +5 ou mais
@@ -156,7 +160,10 @@ const getWinPercentage = (status) => {
     default: return "49-52%";
   }
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> af41b5e (Ajuste removedor de cartas)
 // Função para obter o valor da mão do jogador
 const getHandValue = (hand, cardValues) => {
   if (!hand.length) return 0;
@@ -507,30 +514,17 @@ const LoginScreen = ({ onLogin }) => {
     setErrorMessage('');
     
     try {
-      console.log("Tentando login com:", loginData.email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: loginData.email,
         password: loginData.password,
       });
       
-      if (error) {
-        console.error('Erro de login detalhado:', error);
-        
-        // Verifica se é um erro de email não confirmado
-        if (error.message.includes('email not confirmed')) {
-          setErrorMessage('Por favor, confirme seu email antes de fazer login. Verifique sua caixa de entrada.');
-        } else {
-          setErrorMessage(`Erro: ${error.message}`);
-        }
-        return;
-      }
+      if (error) throw error;
       
-      console.log("Login bem-sucedido:", data);
       onLogin(data.user);
     } catch (error) {
-      console.error('Erro completo:', error);
-      setErrorMessage(`Erro: ${error.message || 'Email ou senha inválidos'}`);
+      console.error('Erro de login:', error);
+      setErrorMessage(t('Email ou senha inválidos. Tente novamente.'));
     } finally {
       setIsLoading(false);
     }
@@ -843,19 +837,55 @@ const BlackjackApp = () => {
   
   // Remover carta da mão do jogador
   const removeCardFromPlayerHand = useCallback((index) => {
+    const cardIndex = playerHand[index];
+    
+    // Remove a carta da mão do jogador
     setPlayerHand(prev => prev.filter((_, i) => i !== index));
-  }, []);
-  
+    
+    // Reverte a contagem
+    setCount(prev => prev - getCardValue(cardIndex));
+    
+    // Devolve a carta ao baralho
+    setRemainingCards(prev => ({
+      ...prev,
+      [cardIndex]: prev[cardIndex] + 1
+    }));
+    
+    // Incrementa o total de cartas
+    setTotalCards(prev => prev + 1);
+    
+    // Remove a carta do histórico
+    setCardHistory(prev => prev.filter(card => card !== cardIndex));
+  }, [playerHand]);
+
   // Remover carta da mão do dealer
   const removeCardFromDealerHand = useCallback((index) => {
+    const cardIndex = dealerHand[index];
+    
+    // Remove a carta da mão do dealer
     setDealerHand(prev => prev.filter((_, i) => i !== index));
-  }, []);
+    
+    // Reverte a contagem
+    setCount(prev => prev - getCardValue(cardIndex));
+    
+    // Devolve a carta ao baralho
+    setRemainingCards(prev => ({
+      ...prev,
+      [cardIndex]: prev[cardIndex] + 1
+    }));
+    
+    // Incrementa o total de cartas
+    setTotalCards(prev => prev + 1);
+    
+    // Remove a carta do histórico
+    setCardHistory(prev => prev.filter(card => card !== cardIndex));
+  }, [dealerHand]);
 
   const calculateOdds = useCallback(() => {
-    // Calcular decks restantes e contagem real
+    const totalCardsDealt = TOTAL_DECKS * CARDS_PER_DECK - totalCards;
     const decksRemaining = totalCards / CARDS_PER_DECK;
     const trueCount = count / decksRemaining;
-  
+
     if (trueCount > 2) return "MUITO FAVORÁVEL";
     if (trueCount > 1) return "FAVORÁVEL";
     if (trueCount < -2) return "MUITO DESFAVORÁVEL";
