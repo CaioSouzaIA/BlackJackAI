@@ -146,10 +146,7 @@ const getStatusColor = (status) => {
 const getWinPercentage = (status) => {
   // Baseado em estudos de vantagem do jogador vs contagem verdadeira
   // Fonte: https://www.blackjackapprenticeship.com/card-counting/
-<<<<<<< HEAD
-=======
   const baseChance = 49; // Chance base do jogador (~49% em contagem neutra)
->>>>>>> af41b5e (Ajuste removedor de cartas)
   
   switch (status) {
     case "MUITO FAVORÁVEL": return "55-58%"; // Contagem +5 ou mais
@@ -160,10 +157,7 @@ const getWinPercentage = (status) => {
     default: return "49-52%";
   }
 };
-<<<<<<< HEAD
 
-=======
->>>>>>> af41b5e (Ajuste removedor de cartas)
 // Função para obter o valor da mão do jogador
 const getHandValue = (hand, cardValues) => {
   if (!hand.length) return 0;
