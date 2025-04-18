@@ -146,7 +146,7 @@ const getStatusColor = (status) => {
 const getWinPercentage = (status) => {
   // Baseado em estudos de vantagem do jogador vs contagem verdadeira
   // Fonte: https://www.blackjackapprenticeship.com/card-counting/
-  const baseChance = 49; // Chance base do jogador (~49% em contagem neutra)
+  // A variável baseChance foi removida pois não era utilizada
   
   switch (status) {
     case "MUITO FAVORÁVEL": return "55-58%"; // Contagem +5 ou mais
@@ -876,8 +876,8 @@ const BlackjackApp = () => {
   }, [dealerHand]);
 
   const calculateOdds = useCallback(() => {
-    const totalCardsDealt = TOTAL_DECKS * CARDS_PER_DECK - totalCards;
     const decksRemaining = totalCards / CARDS_PER_DECK;
+    // A variável totalCardsDealt foi removida pois não era utilizada
     const trueCount = count / decksRemaining;
 
     if (trueCount > 2) return "MUITO FAVORÁVEL";
